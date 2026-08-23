@@ -29,7 +29,7 @@ jobs:
         }
         Write-Host "========================================"
         Write-Host "ANYDESK ID: $id"
-        Write-Host "PASSWORD:   DostKaPass123!"
+        Write-Host "PASSWORD:   TomarJi99"
         Write-Host "========================================"
 
     - name: Keep Alive Loop
