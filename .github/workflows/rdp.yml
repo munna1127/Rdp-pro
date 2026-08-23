@@ -13,17 +13,22 @@ jobs:
       run: |
         Invoke-WebRequest -Uri "https://download.anydesk.com/AnyDesk.exe" -OutFile "AnyDesk.exe"
         Start-Process .\AnyDesk.exe -ArgumentList "--install `"C:\Program Files (x86)\AnyDesk`" --start-with-win --silent" -Wait
+        Start-Service -Name "AnyDesk" -ErrorAction SilentlyContinue
 
     - name: Set AnyDesk Unattended Password
       run: |
-        echo "DostKaPass123!" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
+        cmd.exe /c "echo DostKaPass123! | `"C:\Program Files (x86)\AnyDesk\AnyDesk.exe`" --set-password"
 
     - name: Get AnyDesk ID
       run: |
-        Start-Sleep -Seconds 5
-        $anydesk_id = & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
+        $id = ""
+        for ($i = 0; $i -lt 15; $i++) {
+            Start-Sleep -Seconds 3
+            $id = (cmd.exe /c "`"C:\Program Files (x86)\AnyDesk\AnyDesk.exe`" --get-id").Trim()
+            if ($id -match '^\d+$') { break }
+        }
         Write-Host "========================================"
-        Write-Host "ANYDESK ID: $anydesk_id"
+        Write-Host "ANYDESK ID: $id"
         Write-Host "PASSWORD:   DostKaPass123!"
         Write-Host "========================================"
 
