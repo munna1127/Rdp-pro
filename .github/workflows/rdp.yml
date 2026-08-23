@@ -1,4 +1,4 @@
-name: Windows-RDP-Bore
+name: Windows-RDP-AnyDesk
 
 on: 
   workflow_dispatch:
@@ -9,25 +9,22 @@ jobs:
     timeout-minutes: 360
 
     steps:
-    - name: Enable Windows RDP
+    - name: Download & Install AnyDesk
       run: |
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Invoke-WebRequest -Uri "https://download.anydesk.com/AnyDesk.exe" -OutFile "AnyDesk.exe"
+        Start-Process .\AnyDesk.exe -ArgumentList "--install `"C:\Program Files (x86)\AnyDesk`" --start-with-win --silent" -Wait
 
-    - name: Set Custom RDP Password
+    - name: Set AnyDesk Unattended Password
       run: |
-        net user runneradmin DostKaPassword123!
+        echo "DostKaPass123!" | & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password
 
-    - name: Download & Run Bore Tunnel
+    - name: Get AnyDesk ID
       run: |
-        Invoke-WebRequest -Uri "https://github.com/ekzhang/bore/releases/download/v0.5.2/bore-v0.5.2-x86_64-pc-windows-msvc.zip" -OutFile "bore.zip"
-        Expand-Archive bore.zip -DestinationPath .
-        Start-Process -FilePath ".\bore.exe" -ArgumentList "local 3389 --to bore.pub" -RedirectStandardOutput "bore.log" -NoNewWindow
         Start-Sleep -Seconds 5
-        Get-Content bore.log
+        $anydesk_id = & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
         Write-Host "========================================"
-        Write-Host "Username: runneradmin"
-        Write-Host "Password: DostKaPassword123!"
+        Write-Host "ANYDESK ID: $anydesk_id"
+        Write-Host "PASSWORD:   DostKaPass123!"
         Write-Host "========================================"
 
     - name: Keep Alive Loop
