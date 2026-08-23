@@ -13,11 +13,13 @@ jobs:
       run: |
         Invoke-WebRequest -Uri "https://download.anydesk.com/AnyDesk.exe" -OutFile "AnyDesk.exe"
         Start-Process .\AnyDesk.exe -ArgumentList "--install `"C:\Program Files (x86)\AnyDesk`" --start-with-win --silent" -Wait
-        Start-Service -Name "AnyDesk" -ErrorAction SilentlyContinue
 
-    - name: Set AnyDesk Unattended Password
+    - name: Set Unattended Password
       run: |
-        cmd.exe /c "echo DostKaPass123! | `"C:\Program Files (x86)\AnyDesk\AnyDesk.exe`" --set-password"
+        # Space-free password set & restart service
+        cmd.exe /c "echo TomarJi99| `"C:\Program Files (x86)\AnyDesk\AnyDesk.exe`" --set-password"
+        Restart-Service -Name "AnyDesk" -Force
+        Start-Sleep -Seconds 5
 
     - name: Get AnyDesk ID
       run: |
