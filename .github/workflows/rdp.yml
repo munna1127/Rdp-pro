@@ -1,4 +1,4 @@
-name: Windows-RDP-Ngrok
+name: Windows-RDP-Bore
 
 on: 
   workflow_dispatch:
@@ -18,23 +18,16 @@ jobs:
       run: |
         net user runneradmin DostKaPassword123!
 
-    - name: Download & Setup Ngrok
+    - name: Download & Run Bore Tunnel
       run: |
-        Invoke-WebRequest -Uri "https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip" -OutFile "ngrok.zip"
-        Expand-Archive ngrok.zip -DestinationPath .
-        .\ngrok.exe config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
-        Start-Process -FilePath ".\ngrok.exe" -ArgumentList "tcp 3389" -NoNewWindow
-
-    - name: Show Connection Details
-      run: |
+        Invoke-WebRequest -Uri "https://github.com/ekzhang/bore/releases/download/v0.5.2/bore-v0.5.2-x86_64-pc-windows-msvc.zip" -OutFile "bore.zip"
+        Expand-Archive bore.zip -DestinationPath .
+        Start-Process -FilePath ".\bore.exe" -ArgumentList "local 3389 --to bore.pub" -RedirectStandardOutput "bore.log" -NoNewWindow
         Start-Sleep -Seconds 5
-        $response = Invoke-RestMethod -Uri "http://localhost:4040/api/tunnels"
-        $public_url = $response.tunnels[0].public_url
+        Get-Content bore.log
         Write-Host "========================================"
-        Write-Host "SHARE THIS TO YOUR FRIEND:"
-        Write-Host "Address: $public_url"
         Write-Host "Username: runneradmin"
-        Write-Host "Password: TomarJi@2000"
+        Write-Host "Password: DostKaPassword123!"
         Write-Host "========================================"
 
     - name: Keep Alive Loop
